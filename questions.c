@@ -1,4 +1,3 @@
-
 /*
  * Tutorial 4 Jeopardy Project for SOFE 3950U / CSCI 3020U: Operating Systems
  *
@@ -9,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h> // For strcasecmp
 #include "questions.h"
-
 
 // Define categories (previously in header)
 char categories[NUM_CATEGORIES][MAX_LEN] = {
@@ -31,7 +30,7 @@ void initialize_game(void)
     // Programming Category
     strcpy(questions[0].category, "programming");
     strcpy(questions[0].question, "What is the complexity of binary search?");
-    strcpy(questions[0].answer, "O(logpron)");
+    strcpy(questions[0].answer, "O(log n)");
     questions[0].value = 200;
     questions[0].answered = false;
 
@@ -225,10 +224,9 @@ void display_categories(void)
         bool has_unanswered = false;
 
         for (int j = 0; j < NUM_QUESTIONS; j++) {
-            if (strcmp(questions[j].category, categories[i]) == 0 && !questions[j].answered) {
+            if (strcasecmp(questions[j].category, categories[i]) == 0 && !questions[j].answered) {
                 printf("  $%d - %s\n", questions[j].value, questions[j].question);
                 has_unanswered = true;
-                
             }
         }
 
@@ -239,17 +237,12 @@ void display_categories(void)
     }
 }
 
-
-
-
-
 // Displays the question for the category and dollar value
 void display_question(char *category, int value)
 {
     // Iterate through the questions array to find the category and dollar value
-   
-for (int i = 0; i < NUM_QUESTIONS; i++) {
-        if (strcmp(questions[i].category, category) == 0 && questions[i].value == value) {
+    for (int i = 0; i < NUM_QUESTIONS; i++) {
+        if (strcasecmp(questions[i].category, category) == 0 && questions[i].value == value) {
             if (!questions[i].answered) {
                 // Print the question for the category and value
                 printf("Question: %s\n", questions[i].question);
@@ -261,15 +254,14 @@ for (int i = 0; i < NUM_QUESTIONS; i++) {
         }
     }
     printf("Invalid category or value.\n");
-
 }
 
 // Returns true if the answer is correct for the question for that category and dollar value
 bool valid_answer(char *category, int value, char *answer)
 {
     for (int i = 0; i < NUM_QUESTIONS; i++) {
-        if (strcmp(questions[i].category, category) == 0 && questions[i].value == value) {
-            if (strcmp(questions[i].answer, answer) == 0) {
+        if (strcasecmp(questions[i].category, category) == 0 && questions[i].value == value) {
+            if (strcasecmp(questions[i].answer, answer) == 0) {
                 questions[i].answered = true;  // Mark as answered only when correct
                 return true;
             }
@@ -279,13 +271,12 @@ bool valid_answer(char *category, int value, char *answer)
     return false; // No matching question found
 }
 
-
 // Returns true if the question has already been answered
 bool already_answered(char *category, int value)
 {
     // lookup the question and see if it's already been marked as answered
     for (int i = 0; i < NUM_QUESTIONS; i++) {
-        if (strcmp(questions[i].category, category) == 0 && questions[i].value == value) {
+        if (strcasecmp(questions[i].category, category) == 0 && questions[i].value == value) {
             return questions[i].answered;  // Return true if answered
         }
     }
