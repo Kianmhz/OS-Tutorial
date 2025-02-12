@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>  // For case-insensitive comparisons
+#include <ctype.h>    // For isalnum() and tolower
 #include "questions.h"
 
 // Define the categories.
@@ -215,21 +216,76 @@ void initialize_game(void)
 }
 
 void display_categories(void) {
-    printf("\nAvailable Categories:\n");
+    printf("\nAvailable Questions:\n");
+
+    // --- Print the header row with category names ---
     for (int i = 0; i < NUM_CATEGORIES; i++) {
-        printf("Category: %s\n", categories[i]);
-        bool has_unanswered = false;
-        for (int j = 0; j < NUM_QUESTIONS; j++) {
-            if (strcasecmp(questions[j].category, categories[i]) == 0 && !questions[j].answered) {
-                printf("  $%d\n", questions[j].value);
-                has_unanswered = true;
+        // Use a fixed width for each column (20 characters in this example)
+        printf("%-20s", categories[i]);
+    }
+    printf("\n");
+
+    // --- Determine the maximum number of questions in any category ---
+    int maxQuestions = 0;
+    int questionCount[NUM_CATEGORIES] = {0};
+    for (int c = 0; c < NUM_CATEGORIES; c++) {
+        for (int i = 0; i < NUM_QUESTIONS; i++) {
+            if (strcasecmp(questions[i].category, categories[c]) == 0) {
+                questionCount[c]++;
             }
         }
-        if (!has_unanswered) {
-            printf("  (All questions answered)\n");
+        if (questionCount[c] > maxQuestions) {
+            maxQuestions = questionCount[c];
         }
     }
+
+    // --- Allocate temporary storage for each category's question values and answered status ---
+    // We use dynamic arrays (one per category) to store the question values and whether they've been answered.
+    int *values[NUM_CATEGORIES];
+    bool *answered[NUM_CATEGORIES];
+    for (int c = 0; c < NUM_CATEGORIES; c++) {
+        values[c] = malloc(questionCount[c] * sizeof(int));
+        answered[c] = malloc(questionCount[c] * sizeof(bool));
+        int pos = 0;
+        // Collect all questions for this category.
+        for (int i = 0; i < NUM_QUESTIONS; i++) {
+            if (strcasecmp(questions[i].category, categories[c]) == 0) {
+                values[c][pos] = questions[i].value;
+                answered[c][pos] = questions[i].answered;
+                pos++;
+            }
+        }
+    }
+
+    // --- Print the grid rows ---
+    // Each row corresponds to one question (e.g., first question, second question, etc.) for each category.
+    for (int row = 0; row < maxQuestions; row++) {
+        for (int cat = 0; cat < NUM_CATEGORIES; cat++) {
+            if (row < questionCount[cat]) {
+                if (answered[cat][row]) {
+                    // If the question is answered, print an "X" or other marker.
+                    printf("%-20s", "X");
+                } else {
+                    // Otherwise, print the dollar value.
+                    char buf[32];
+                    sprintf(buf, "$%d", values[cat][row]);
+                    printf("%-20s", buf);
+                }
+            } else {
+                // If this category doesn't have a question in this row, print an empty column.
+                printf("%-20s", " ");
+            }
+        }
+        printf("\n");
+    }
+
+    // --- Free temporary storage ---
+    for (int c = 0; c < NUM_CATEGORIES; c++) {
+        free(values[c]);
+        free(answered[c]);
+    }
 }
+
 
 void display_question(char *category, int value) {
     for (int i = 0; i < NUM_QUESTIONS; i++) {
@@ -246,10 +302,36 @@ void display_question(char *category, int value) {
     printf("Invalid category or value.\n");
 }
 
+/**
+ * THIS IS HOW WE HANDLE RANDOM SPACES AND UPPERCASES IN USER INPUT
+ * Normalize a string by converting it to lowercase and removing non-alphanumeric characters.
+ */
+void normalize_string(char *dest, const char *src) {
+    while (*src) {
+        if (isalnum((unsigned char)*src)) { // Only include letters and digits.
+            *dest = tolower((unsigned char)*src);
+            dest++;
+        }
+        src++;
+    }
+    *dest = '\0';
+}
+
+/**
+ * Returns true if the sanitized user answer matches the sanitized correct answer.
+ */
 bool valid_answer(char *category, int value, char *answer) {
+    char norm_user[MAX_LEN];
+    char norm_correct[MAX_LEN];
+    
+    // Normalize the user's answer.
+    normalize_string(norm_user, answer);
+    
     for (int i = 0; i < NUM_QUESTIONS; i++) {
         if (strcasecmp(questions[i].category, category) == 0 && questions[i].value == value) {
-            if (strcasecmp(questions[i].answer, answer) == 0) {
+            // Normalize the stored answer.
+            normalize_string(norm_correct, questions[i].answer);
+            if (strcmp(norm_user, norm_correct) == 0) {
                 return true;
             }
             return false;

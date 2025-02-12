@@ -128,8 +128,14 @@
              printf("Invalid answer format. Answer must start with 'what is' or 'who is'.\n");
              continue;
          }
-         // For simplicity, we assume the answer is contained in the third token.
-         char *playerAnswer = tokens[2];
+         // Concatenate tokens[2] onward to form the full answer.
+        char playerAnswer[MAX_LEN] = "";
+        for (int i = 2; tokens[i] != NULL; i++) {
+            strcat(playerAnswer, tokens[i]);
+            if (tokens[i+1] != NULL) {
+                strcat(playerAnswer, " ");
+            }
+        }
  
          // --- Requirement 8: Validate answer, update score if correct, or display correct answer ---
          if (valid_answer(category, value, playerAnswer)) {
