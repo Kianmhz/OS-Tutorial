@@ -1,19 +1,19 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99
-LFLAGS = 
-LIBS = 
+LFLAGS =
+LIBS =
 SOURCES = jeopardy.c questions.c players.c
 OBJECTS = $(subst .c,.o,$(SOURCES))
 EXE = jeopardy.exe
 .PHONY: clean help
 
-jeopardy.exe : jeopardy.o questions.o players.o
-	$(CC) $(CFLAGS) $^ $(LIBS) -o $@ 
+$(EXE): $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) $(LIBS) -o $(EXE)
 
-%.o : %.c
-	$(CC) $(CFLAGS) -c $< 
+%.o: %.c
+	$(CC) $(CFLAGS) -c $<
 
-all : $(EXE)
+all: $(EXE)
 
 clean:
 	rm -f $(OBJECTS) $(EXE) *~

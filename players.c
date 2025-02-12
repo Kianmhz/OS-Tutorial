@@ -10,27 +10,18 @@
 #include <string.h>
 #include "players.h"
 
-bool player_exists(player *players, int num_players, char *name)
-{
-    for (int i = 0; i < num_players; i++)
-    {
-        if (strcmp(players[i].name, name) == 0)
-        {
+bool player_exists(player *players, int num_players, char *name) {
+    for (int i = 0; i < num_players; i++) {
+        if (strcmp(players[i].name, name) == 0) {
             return true; // Player found
         }
     }
     return false; // Player not found
 }
 
-
-// Go through the list of players and update the score for the 
-// player given their name
-void update_score(player *players, int num_players, char *name, int score)
-{
-    for (int i = 0; i < num_players; i++)
-    {
-        if (strcmp(players[i].name, name) == 0)
-        {
+void update_score(player *players, int num_players, char *name, int score) {
+    for (int i = 0; i < num_players; i++) {
+        if (strcmp(players[i].name, name) == 0) {
             players[i].score += score; // Add score to the player's current score
             return;
         }

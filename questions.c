@@ -8,10 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h> // For strcasecmp
+#include <strings.h>  // For case-insensitive comparisons
 #include "questions.h"
 
-// Define categories (previously in header)
+// Define the categories.
 char categories[NUM_CATEGORIES][MAX_LEN] = {
     "programming", 
     "algorithms", 
@@ -21,7 +21,7 @@ char categories[NUM_CATEGORIES][MAX_LEN] = {
     "web development"
 };
 
-// Define questions array (previously in header)
+// Define the questions array.
 question questions[NUM_QUESTIONS];
 
 // Initializes the array of questions for the game
@@ -214,37 +214,27 @@ void initialize_game(void)
     questions[29].answered = false;
 }
 
-// Displays each of the remaining categories and question dollar values that have not been answered
-void display_categories(void)
-{
+void display_categories(void) {
     printf("\nAvailable Categories:\n");
-
     for (int i = 0; i < NUM_CATEGORIES; i++) {
         printf("Category: %s\n", categories[i]);
         bool has_unanswered = false;
-
         for (int j = 0; j < NUM_QUESTIONS; j++) {
             if (strcasecmp(questions[j].category, categories[i]) == 0 && !questions[j].answered) {
-                printf("  $%d - %s\n", questions[j].value, questions[j].question);
+                printf("  $%d\n", questions[j].value);
                 has_unanswered = true;
             }
         }
-
-        // If all questions in a category are answered, indicate it
         if (!has_unanswered) {
             printf("  (All questions answered)\n");
         }
     }
 }
 
-// Displays the question for the category and dollar value
-void display_question(char *category, int value)
-{
-    // Iterate through the questions array to find the category and dollar value
+void display_question(char *category, int value) {
     for (int i = 0; i < NUM_QUESTIONS; i++) {
         if (strcasecmp(questions[i].category, category) == 0 && questions[i].value == value) {
             if (!questions[i].answered) {
-                // Print the question for the category and value
                 printf("Question: %s\n", questions[i].question);
                 return;
             } else {
@@ -256,29 +246,32 @@ void display_question(char *category, int value)
     printf("Invalid category or value.\n");
 }
 
-// Returns true if the answer is correct for the question for that category and dollar value
-bool valid_answer(char *category, int value, char *answer)
-{
+bool valid_answer(char *category, int value, char *answer) {
     for (int i = 0; i < NUM_QUESTIONS; i++) {
         if (strcasecmp(questions[i].category, category) == 0 && questions[i].value == value) {
             if (strcasecmp(questions[i].answer, answer) == 0) {
-                questions[i].answered = true;  // Mark as answered only when correct
                 return true;
             }
-            return false; // Wrong answer, but don't mark as answered
+            return false;
         }
     }
-    return false; // No matching question found
+    return false;
 }
 
-// Returns true if the question has already been answered
-bool already_answered(char *category, int value)
-{
-    // lookup the question and see if it's already been marked as answered
+bool already_answered(char *category, int value) {
     for (int i = 0; i < NUM_QUESTIONS; i++) {
         if (strcasecmp(questions[i].category, category) == 0 && questions[i].value == value) {
-            return questions[i].answered;  // Return true if answered
+            return questions[i].answered;
         }
     }
-    return false;  // Return false if not answered
+    return false;
+}
+
+const char* get_correct_answer(char *category, int value) {
+    for (int i = 0; i < NUM_QUESTIONS; i++) {
+        if (strcasecmp(questions[i].category, category) == 0 && questions[i].value == value) {
+            return questions[i].answer;
+        }
+    }
+    return "Unknown";
 }
