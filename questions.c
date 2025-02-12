@@ -349,6 +349,16 @@ bool already_answered(char *category, int value) {
     return false;
 }
 
+int count_unanswered_questions(void) {
+    int count = 0;
+    for (int i = 0; i < NUM_QUESTIONS; i++) {
+        if (!questions[i].answered) {
+            count++;
+        }
+    }
+    return count;
+}
+
 const char* get_correct_answer(char *category, int value) {
     for (int i = 0; i < NUM_QUESTIONS; i++) {
         if (strcasecmp(questions[i].category, category) == 0 && questions[i].value == value) {
